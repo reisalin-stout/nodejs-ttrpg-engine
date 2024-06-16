@@ -3,9 +3,9 @@
   "type": "module",
   "version": "1.0.0",
   "description": "An RPG tool for DMing interactive adventures",
-  "main": "main.js",
+  "main": "game.js",
   "scripts": {
-    "test": "node main.js"
+    "play": "node game.js"
   },
   "author": "reisalin",
   "license": "ISC"
