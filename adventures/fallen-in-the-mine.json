@@ -1,0 +1,72 @@
+{
+  "softname": "Fallen in the Mines",
+  "enemies": [],
+  "nodes": [
+    {
+      "id": "start",
+      "type": "narrative",
+      "next": ["ground-floor-choice"],
+      "story": [
+        {
+          "command": "present",
+          "value": "While working you fell in the mines\nThat hurts"
+        },
+        {
+          "command": "present",
+          "value": "This was quite unexpected"
+        },
+        {
+          "command": "present",
+          "value": "time to move on"
+        },
+        {
+          "command": "clearScreen"
+        },
+        {
+          "command": "present",
+          "value": "The road might be a bit hard"
+        },
+        {
+          "command": "present",
+          "value": "I hope we made the right choice"
+        },
+        {
+          "command": "multiChoice",
+          "options": ["Pick A", "Pick B"],
+          "targets": ["ground-floor", "ground-floor-late"],
+          "response": ["Going to the ground floor", "We'll just wait around"]
+        }
+      ]
+    },
+    {
+      "id": "ground-floor-choice",
+      "type": "binary",
+      "next": ["ground-floor", "ground-floor-late"],
+      "flow": [
+        0,
+        "who knows when the rescue will be ready",
+        2,
+        "wait for rescue",
+        "look for a way back"
+      ]
+    },
+    {
+      "id": "ground-floor",
+      "type": "narration",
+      "next": ["end"],
+      "flow": [0, "you survived!"]
+    },
+    {
+      "id": "ground-floor-late",
+      "type": "narration",
+      "next": ["end"],
+      "flow": [0, "You died"]
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "next": [],
+      "flow": []
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "node-adventure-carryout",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "An RPG tool for DMing interactive adventures",
+  "main": "main.js",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "author": "reisalin",
+  "license": "ISC"
+}
