@@ -1,13 +1,18 @@
 const HUDROWS = 1;
-
+let adv;
 export class Scene {
-  constructor(scene) {
+  constructor(adventure) {
+    this.adventure = adventure;
+    adv = adventure;
+    this.scene = this.adventure.nodes[0];
     getTerminal().clear();
-    getTerminal().title(`Location: ${scene.id} | Type: ${scene.type}`);
+    getTerminal().title(
+      `Location: ${this.scene.id} | Type: ${this.scene.type}`
+    );
     global.currentScene = () => {
-      switch (scene.type) {
+      switch (this.scene.type) {
         case "narrative":
-          return new Narrative(scene);
+          return new Narrative(this.scene);
       }
     };
     currentScene();
@@ -25,6 +30,11 @@ class Narrative {
       },
     });
     this.startScene();
+  }
+
+  findScene(id) {
+    let targetScene = adv.nodes.find((obj) => obj.id === id);
+    return targetScene;
   }
 
   startScene() {
@@ -50,11 +60,15 @@ class Narrative {
       case "multiChoice":
         new MultiChoice(
           this.sceneData.story[this.scenePoint].options,
+          this.sceneData.story[this.scenePoint].response,
           this.sceneData.story[this.scenePoint].targets,
           (choice) => {
-            console.log("You picked ", choice);
+            console.log(this.findScene(choice));
           }
         );
+        break;
+      case "groupThrow":
+        new GroupThrow();
     }
   }
 
@@ -64,21 +78,36 @@ class Narrative {
 }
 
 class MultiChoice {
-  constructor(options, targets, callback) {
+  constructor(options, response, targets, callback) {
+    this.options = options;
+    this.response = response;
+    this.targets = targets;
+
+    this.completed = false;
     this.cursorIndex = -1;
     getTerminal().text("Choice:");
     this.cursorOrigin = getTerminal().displayedRows;
 
     getPlayerController().captureEvents({
       keyUp: () => {
-        this.moveCursor(1);
+        if (!this.completed) {
+          this.moveCursor(1);
+        }
       },
       keyDown: () => {
-        this.moveCursor(1);
+        if (!this.completed) {
+          this.moveCursor(1);
+        }
       },
       Enter: () => {
-        getPlayerController().freeEvents();
-        callback(this.cursorIndex);
+        if (this.completed) {
+          getPlayerController().freeEvents();
+          callback(this.targets[this.cursorIndex]);
+        } else if (this.cursorIndex >= 0) {
+          getTerminal().newLine();
+          getTerminal().slowText(this.response[this.cursorIndex]);
+          this.completed = true;
+        }
       },
     });
     this.draw();
@@ -92,50 +121,23 @@ class MultiChoice {
 
   draw() {
     this.cursorIndex == 0
-      ? getTerminal().selected("Pick A")
-      : getTerminal().unselected("Pick A");
+      ? getTerminal().selected(this.options[0])
+      : getTerminal().unselected(this.options[0]);
 
     this.cursorIndex == 1
-      ? getTerminal().selected("Pick B")
-      : getTerminal().unselected("Pick B");
-
-    getTerminal().numberedInput();
+      ? getTerminal().selected(this.options[1])
+      : getTerminal().unselected(this.options[1]);
   }
+
+  respond() {}
 }
 
 class GroupThrow {
-  constructor(options, targets) {
-    this.cursorIndex = -1;
-    getTerminal().text("Choice:");
-    this.cursorOrigin = getTerminal().getRowIndex();
+  constructor() {
+    getTerminal().text("Insert Result:");
 
-    getPlayerController().captureEvents({
-      keyUp: () => {
-        this.moveCursor(1);
-      },
-      keyDown: () => {
-        this.moveCursor(1);
-      },
-      Enter: () => {
-        console.log("you picked ", this.cursorIndex);
-      },
+    getTerminal().enableInput((result) => {
+      console.log("you typed", result);
     });
-    this.draw();
-  }
-
-  moveCursor(distance) {
-    getTerminal().clearLastNLines(2);
-    this.cursorIndex = Math.abs(this.cursorIndex + distance) % 2;
-    this.draw();
-  }
-
-  draw() {
-    this.cursorIndex == 0
-      ? getTerminal().selected("Pick A")
-      : getTerminal().text("Pick A");
-
-    this.cursorIndex == 1
-      ? getTerminal().selected("Pick B")
-      : getTerminal().text("Pick B");
   }
 }

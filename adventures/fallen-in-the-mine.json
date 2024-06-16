@@ -32,9 +32,14 @@
         },
         {
           "command": "multiChoice",
-          "options": ["Pick A", "Pick B"],
-          "targets": ["ground-floor", "ground-floor-late"],
-          "response": ["Going to the ground floor", "We'll just wait around"]
+          "options": ["Move on", "Wait for rescue"],
+          "response": ["Going to the ground floor", "We'll just wait around"],
+          "targets": ["ground-floor", "ground-floor-late"]
+        },
+        {
+          "command": "groupThrow",
+          "breakpoints": [0, 10, 20],
+          "targets": []
         }
       ]
     },

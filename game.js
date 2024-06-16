@@ -20,4 +20,4 @@ const SETTINGS = new Settings();
 const GAMEINSTANCE = new GameInstance();
 const TERMINAL = new Terminal();
 const PLAYERCONTROLLER = new PlayerController();
-const SCENE = new Scene(adventure.nodes[0]);
+const SCENE = new Scene(adventure);

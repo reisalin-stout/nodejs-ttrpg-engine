@@ -17,6 +17,10 @@ export class Terminal {
     this.debugRows = false;
     this.displayedRows = 0;
     this.cursorPosition = 0;
+
+    this.inputBuffer = "";
+    this.isInputEnabled = false;
+
     this.clear();
 
     global.getTerminal = () => {
@@ -99,6 +103,9 @@ export class Terminal {
   text(text) {
     this.line(text, { color: WHITE, tabs: 1 });
   }
+  slowText(text) {
+    this.line(text, { color: WHITE, delayed: true, tabs: 1 });
+  }
   title(text) {
     this.line(text, { color: BLUE });
   }
@@ -108,7 +115,9 @@ export class Terminal {
   warning(text) {
     this.line(text, { color: RED });
   }
-
+  newLine() {
+    this.line("");
+  }
   //Terminal Line Management
   moveToLine(line) {
     this.cursorPosition = line;
@@ -128,7 +137,7 @@ export class Terminal {
     this.displayedRows = line;
   }
 
-  clearLastNLines(n) {
+  clearLastNLines(n = 0) {
     let targetline = this.displayedRows - n;
     this.clearTerminalFromLine(targetline);
   }
@@ -138,7 +147,39 @@ export class Terminal {
   }
 
   //Number Input
-  numberedInput() {
-    getPlayerController().enableInput();
+
+  inputReceiver(input) {
+    if (this.isInputEnabled) {
+      this.inputBuffer += input;
+      process.stdout.write(input);
+    }
+  }
+
+  enableInput(callback) {
+    this.isInputEnabled = true;
+    process.stdout.write(global.settings.inputIndicator);
+    getPlayerController().captureEvents({
+      Enter: () => {
+        process.stdout.write("\n");
+        this.cursorPosition++;
+        this.displayedRows++;
+        callback(this.inputBuffer);
+        this.disableInput();
+      },
+      Backspace: () => {
+        this.inputBuffer = this.inputBuffer.substring(
+          0,
+          this.inputBuffer.length - 1
+        );
+        this.clearLastNLines();
+        process.stdout.write(global.settings.inputIndicator);
+        process.stdout.write(this.inputBuffer);
+      },
+    });
+  }
+  disableInput() {
+    this.isInputEnabled = false;
+    this.inputBuffer = "";
+    getPlayerController().freeEvents();
   }
 }

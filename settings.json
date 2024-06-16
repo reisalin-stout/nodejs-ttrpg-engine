@@ -3,5 +3,6 @@
     "characters": "./characters",
     "optionslength" : 5,
     "textSpeed" : 5,
-    "tabDisplay":" > "
+    "tabDisplay":"  ",
+    "inputIndicator": "    > "
 }
